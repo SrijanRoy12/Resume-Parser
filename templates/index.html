@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resume Parser</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Sticky footer layout */
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .content {
+      flex: 1;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .upload-form {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .upload-form input[type="file"] {
+      margin-bottom: 10px;
+    }
+
+    .results .section {
+      margin-bottom: 30px;
+    }
+
+    .results ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .results li {
+      padding: 5px 0;
+    }
+
+    .description {
+      color: #e67e22;
+    }
+
+    /* Footer Styles */
+    .footer {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+      padding: 40px 0 20px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .social-icon {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .social-icon i {
+      position: relative;
+      z-index: 2;
+    }
+
+    .liquid-bg {
+      position: absolute;
+      top: -60px;
+      left: 0;
+      width: 100%;
+      height: 200%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+      transform: rotate(45deg);
+      transition: all 0.6s ease;
+      z-index: 1;
+    }
+
+    .social-icon:hover .liquid-bg {
+      animation: liquidFlow 1.5s linear infinite;
+    }
+
+    .social-icon:nth-child(1) { background: #0A66C2; }
+    .social-icon:nth-child(2) { background: #333; }
+    .social-icon:nth-child(3) { background: #EA4335; }
+    .social-icon:nth-child(4) { background: #000; }
+
+    .social-icon:hover {
+      transform: translateY(-8px) scale(1.1);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .social-icon::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .social-icon:hover::after {
+      opacity: 1;
+      bottom: -35px;
+    }
+
+    .copyright-text {
+      text-align: center;
+      padding: 0 20px;
+      margin-bottom: 20px;
+    }
+
+    .copyright-part {
+      position: relative;
+      display: inline-block;
+      padding: 0 5px;
+      color: var(--color);
+      transition: all 0.3s ease;
+    }
+
+    .copyright-part::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--color);
+      transition: width 0.3s ease;
+    }
+
+    .copyright-part:hover {
+      text-shadow: 0 0 10px var(--color);
+    }
+
+    .copyright-part:hover::after {
+      width: 100%;
+    }
+
+    .footer-wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      overflow: hidden;
+    }
+
+    .wave-fill {
+      fill: rgba(255, 255, 255, 0.05);
+      animation: waveAnimation 10s linear infinite;
+    }
+
+    .wave-fill:nth-child(2) {
+      animation-delay: -5s;
+      animation-duration: 15s;
+    }
+
+    .wave-fill:nth-child(3) {
+      animation-delay: -2s;
+      animation-duration: 12s;
+    }
+
+    @keyframes liquidFlow {
+      0% { transform: rotate(45deg) translateY(-200px); }
+      100% { transform: rotate(45deg) translateY(0); }
+    }
+
+    @keyframes waveAnimation {
+      0% { transform: translateX(0) translateZ(0) scaleY(1); }
+      50% { transform: translateX(-25%) translateZ(0) scaleY(0.5); }
+      100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+    }
+
+    @media (max-width: 768px) {
+      .social-links { gap: 15px; }
+      .social-icon { width: 45px; height: 45px; font-size: 1.3rem; }
+      .copyright-text { font-size: 0.8rem; }
+      .footer-wave { height: 60px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <main class="content">
+      <div class="container">
+        <div class="upload-form">
+          <h1>AI Resume Parser</h1>
+          <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="resume" accept=".pdf" required>
+            <button type="submit">Upload & Parse</button>
+          </form>
+        </div>
+
+        <div class="results">
+          {% for section, content in sections.items() %}
+            <div class="section">
+              <h2>{{ section }}</h2>
+              <ul>
+                {% for line in content %}
+                  {% if 'DESCRIPTION' in line.upper() %}
+                    <li class="description"><strong>{{ line }}</strong></li>
+                  {% else %}
+                    <li>{{ line }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/srijan-roy-iemians/" target="_blank" class="social-icon" data-tooltip="LinkedIn">
+          <i class="fab fa-linkedin"></i><span class="liquid-bg"></span>
+        </a>
+        <a href="https://github.com/SrijanRoy12" target="_blank" class="social-icon" data-tooltip="GitHub">
+          <i class="fab fa-github"></i><span class="liquid-bg"></span>
+        </a>
+        <a href="mailto:roysrijan53@gmail.com" class="social-icon" data-tooltip="Email">
+          <i class="far fa-envelope"></i><span class="liquid-bg"></span>
+        </a>
+        <a href="https://x.com/home" target="_blank" class="social-icon" data-tooltip="Twitter">
+          <i class="fab fa-x-twitter"></i><span class="liquid-bg"></span>
+        </a>
+      </div>
+
+      <div class="copyright-text">
+        <small>
+          <strong>
+            <span class="copyright-part" style="--color: #FF9933;">© 2️⃣0️⃣2️⃣5️⃣ 𝙎𝙧𝙞𝙟𝙖𝙣❜𝙨 𝙋𝙤𝙧𝙩𝙛𝙤𝙡𝙞𝙤 |</span>
+            <span class="copyright-part" style="--color: #FFFFFF;"> 𝘾𝙧𝙚𝙖𝙩𝙞𝙣𝙜 𝙬𝙞𝙩𝙝 𝙘𝙤𝙣𝙫𝙞𝙘𝙩𝙞𝙤𝙣, 𝙘𝙤𝙙𝙞𝙣𝙜 𝙬𝙞𝙩𝙝 𝙥𝙪𝙧𝙥𝙤𝙨𝙚 |</span>
+            <span class="copyright-part" style="--color: #138808;"> 𝘼𝙡𝙡 𝙧𝙞𝙜𝙝𝙩𝙨 𝙧𝙚𝙨𝙚𝙧𝙫𝙚𝙙</span>
+          </strong>
+        </small>
+      </div>
+
+      <div class="footer-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,0V46.29c47.79,22.2..." opacity=".25" class="wave-fill"></path>
+          <path d="M0,0V15.81c13,36.92..." opacity=".5" class="wave-fill"></path>
+          <path d="M0,0V5.63c149.93,59..." class="wave-fill"></path>
+        </svg>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Ripple effect for icons -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const icons = document.querySelectorAll('.social-icon');
+      icons.forEach(icon => {
+        icon.addEventListener('click', function (e) {
+          const ripple = document.createElement('span');
+          ripple.className = 'ripple-effect';
+          ripple.style.left = (e.pageX - this.getBoundingClientRect().left - this.offsetWidth / 2) + 'px';
+          ripple.style.top = (e.pageY - this.getBoundingClientRect().top - this.offsetHeight / 2) + 'px';
+          this.appendChild(ripple);
+          setTimeout(() => { ripple.remove(); }, 1000);
+        });
+      });
+
+      const style = document.createElement('style');
+      style.textContent = `
+        .ripple-effect {
+          position: absolute;
+          width: 100px;
+          height: 100px;
+          background: rgba(255,255,255,0.4);
+          border-radius: 50%;
+          transform: scale(0);
+          animation: ripple 0.6s linear;
+          pointer-events: none;
+        }
+
+        @keyframes ripple {
+          to {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    });
+  </script>
+</body>
+</html>
